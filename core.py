@@ -131,7 +131,7 @@ def compress_channel(img, qtable):
             temp.append((inverse_RLC[j + i * 63]))
         temp2.append(temp)
         # inverse Zig-Zag và nghịch đảo Lượng tử hóa các hệ số DCT
-        inverse_blockq = zig_zag_reverse(np.array(temp).reshape((8, 8)))
+        inverse_blockq = zig_zag_reverse(temp)
 
         # inverse DCT
         inverse_dct = idct_block(iQuantize(inverse_blockq,qtable))
@@ -150,5 +150,5 @@ def compress_channel(img, qtable):
 
     np.place(new_img, new_img > 255, 255)
     np.place(new_img, new_img < 0, 0)
-
+    print(new_img)
     return new_img

@@ -36,7 +36,10 @@ for image_file in image_files:
 
     # Read the image
     image = cv2.imread(filepath)
-
+    oHeight, oWidth = image.shape[:2]
+    pad_height = (8 - oHeight % 8) % 8
+    pad_width = (8 - oWidth % 8) % 8
+    image = np.pad(image, ((0, pad_height), (0, pad_width), (0, 0)), mode='constant', constant_values=255)
     
     start = time.time()
     channels = cv2.split(image)
@@ -54,9 +57,10 @@ for image_file in image_files:
     # print(img)
     # Chuyển đổi ảnh YCbCr lại thành ảnh màu
     # new_img = cv2.cvtColor(img, cv2.COLOR_YCrCb2RGB)
-    compressed_ycrcb = cv2.merge((result[0][0], result[1][0], result[2][0]))
+    compressed_ycrcb = cv2.merge((result[0], result[1], result[2]))
+    compressed_ycrcb = compressed_ycrcb.astype(np.uint8)
     new_img = cv2.cvtColor(compressed_ycrcb,cv2.COLOR_YCrCb2RGB)
-    
+
     # Hiển thị ảnh gốc và ảnh giải nén
     plt.subplot(121), plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Original Image')
     plt.subplot(122), plt.imshow(new_img), plt.axis('off'), plt.title('Reconstructed Image')

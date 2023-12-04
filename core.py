@@ -26,7 +26,7 @@ def compress_channel(img, qtable):
 
             # Lượng tử hóa các hệ số DCT
             block_q = quantize(dct,qtable)
-
+            print("block",block_q)
             # Zig Zag
             zigZag.append(zig_zag(block_q, 8))
             
@@ -92,14 +92,14 @@ def compress_channel(img, qtable):
     dDPCM = decode(sDPMC, rootDPCM)
     decodeDPMC = []
     for i in range(0, len(dDPCM)):
-        decodeDPMC.append(float(dDPCM[i]))
+        decodeDPMC.append(int(dDPCM[i]))
 
     # Huffman RLC
     # Giải mã một chuỗi nhị phân bằng cách sử dụng cây Huffman được truy cập thông qua root
     dRLC = decode(sRLC, root)
     decodeRLC = []
     for i in range(0, len(dRLC)):
-        decodeRLC.append(float(dRLC[i]))
+        decodeRLC.append(int(dRLC[i]))
 
     # Inverse DPCM
     inverse_DPCM = []
@@ -132,10 +132,11 @@ def compress_channel(img, qtable):
         temp2.append(temp)
         # inverse Zig-Zag và nghịch đảo Lượng tử hóa các hệ số DCT
         inverse_blockq = zig_zag_reverse(temp)
-
+        print("zigzag", inverse_blockq)
         # inverse DCT
         inverse_dct = idct_block(iQuantize(inverse_blockq,qtable))
-
+        print("quanti",iQuantize(inverse_blockq,qtable))
+        print("idct", inverse_dct)
         # Update new_img
         new_img[height:height + 8, width:width + 8] = inverse_dct
 
@@ -150,5 +151,4 @@ def compress_channel(img, qtable):
 
     np.place(new_img, new_img > 255, 255)
     np.place(new_img, new_img < 0, 0)
-    print(new_img)
     return new_img

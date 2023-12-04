@@ -26,7 +26,7 @@ def compress_channel(img, qtable):
 
             # Lượng tử hóa các hệ số DCT
             block_q = quantize(dct,qtable)
-            print("block",block_q)
+            #print("block",block_q)
             # Zig Zag
             zigZag.append(zig_zag(block_q, 8))
             
@@ -132,11 +132,11 @@ def compress_channel(img, qtable):
         temp2.append(temp)
         # inverse Zig-Zag và nghịch đảo Lượng tử hóa các hệ số DCT
         inverse_blockq = zig_zag_reverse(temp)
-        print("zigzag", inverse_blockq)
+        #print("zigzag", inverse_blockq)
         # inverse DCT
         inverse_dct = idct_block(iQuantize(inverse_blockq,qtable))
-        print("quanti",iQuantize(inverse_blockq,qtable))
-        print("idct", inverse_dct)
+        #print("quanti",iQuantize(inverse_blockq,qtable))
+        #print("idct", inverse_dct)
         # Update new_img
         new_img[height:height + 8, width:width + 8] = inverse_dct
 

@@ -6,6 +6,7 @@ import numpy as np
 import time
 import pandas as pd
 from calculate import *
+from quantization import *
 
 
 
@@ -38,20 +39,28 @@ for image_file in image_files:
 
     
     start = time.time()
-    result = np.zeros_like(image)
+    channels = cv2.split(image)
+
+    # Khởi tạo kết quả
+    result = [None] * 3
     for i in range(3):
-        result[:,:,i] = compress_channel(image[:,:,i])
+        if(i == 0) :
+            result[i] = compress_channel(channels[i], qtableY)
+        else:
+            result[i] = compress_channel(channels[i], qtableC)
     stop = time.time()  
     
     
     # print(img)
     # Chuyển đổi ảnh YCbCr lại thành ảnh màu
     # new_img = cv2.cvtColor(img, cv2.COLOR_YCrCb2RGB)
-    new_img = cv2.cvtColor(result,cv2.COLOR_YCrCb2RGB)
+    compressed_ycrcb = cv2.merge((result[0][0], result[1][0], result[2][0]))
+    new_img = cv2.cvtColor(compressed_ycrcb,cv2.COLOR_YCrCb2RGB)
+    
     # Hiển thị ảnh gốc và ảnh giải nén
     plt.subplot(121), plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Original Image')
-    # plt.subplot(122), plt.imshow(new_img), plt.axis('off'), plt.title('Reconstructed Image')
-    plt.subplot(122), plt.imshow(cv2.cvtColor(new_img, cv2.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Recovered Image')
+    plt.subplot(122), plt.imshow(new_img), plt.axis('off'), plt.title('Reconstructed Image')
+    # plt.subplot(122), plt.imshow(cv2.cvtColor(new_img, cv2.COLOR_BGR2RGB)), plt.axis('off'), plt.title('Recovered Image')
     plt.show()
 
     new_img = cv2.cvtColor(new_img, cv2.COLOR_RGB2BGR)

@@ -4,18 +4,10 @@ from zigzag import *
 import cv2
 import collections
 import numpy as np
+from quantization import *
 
 
-qtable = np.array([[16, 11, 10, 16, 24, 40, 51, 61],
-                    [12, 12, 14, 19, 26, 58, 60, 55],
-                    [14, 13, 16, 24, 40, 57, 69, 56],
-                    [14, 17, 22, 29, 51, 87, 80, 62],
-                    [18, 22, 37, 56, 68, 109, 103, 77],
-                    [24, 35, 55, 64, 81, 104, 113, 92],
-                    [49, 64, 78, 87, 103, 121, 120, 101],
-                    [72, 92, 95, 98, 112, 100, 103, 99]])
-
-def compress_channel(img):
+def compress_channel(img, qtable):
     
     # Kích thước ảnh
     iHeight, iWidth = img.shape[:2]
@@ -33,7 +25,7 @@ def compress_channel(img):
             dct = dct_block(block_t)
 
             # Lượng tử hóa các hệ số DCT
-            block_q = np.floor(np.divide(dct, qtable) + 0.5)
+            block_q = quantize(dct,qtable)
 
             # Zig Zag
             zigZag.append(zig_zag(block_q, 8))
@@ -139,11 +131,10 @@ def compress_channel(img):
             temp.append((inverse_RLC[j + i * 63]))
         temp2.append(temp)
         # inverse Zig-Zag và nghịch đảo Lượng tử hóa các hệ số DCT
-        inverse_blockq = np.multiply(np.reshape(
-            zig_zag_reverse(temp2), (8, 8)), qtable)
+        inverse_blockq = zig_zag_reverse(np.array(temp).reshape((8, 8)))
 
         # inverse DCT
-        inverse_dct = idct_block(inverse_blockq)
+        inverse_dct = idct_block(iQuantize(inverse_blockq,qtable))
 
         # Update new_img
         new_img[height:height + 8, width:width + 8] = inverse_dct
